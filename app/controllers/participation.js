@@ -2,7 +2,7 @@ const { User, Exploration } = require("../models");
 const { errorMessage } = require("../constants");
 
 module.exports = {
-  getAll: async (req, res) => {
+  getParticipants: async (req, res) => {
     try {
       const { id } = req.params;
       const exploration = await Exploration.findByPk(id, {
@@ -23,7 +23,7 @@ module.exports = {
     }
   },
 
-  add: async (req, res) => {
+  addParticipant: async (req, res) => {
     try {
       const { id, userId } = req.params;
 
@@ -79,7 +79,7 @@ module.exports = {
     }
   },
 
-  delete: async (req, res) => {
+  removeParticipant: async (req, res) => {
     try {
       const { id, userId } = req.params;
 
