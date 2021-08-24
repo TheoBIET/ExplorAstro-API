@@ -184,6 +184,11 @@ module.exports = {
   },
 
   updateAvatar: (req, res) => {
+    
+    return res.json({
+      message: 'NOT IMPLEMENTED',
+    });
+    
     upload(req, res, async (err) => {
       if (err) {
         return res.status(400).json({
