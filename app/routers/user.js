@@ -76,12 +76,6 @@ router
     userController.updateUsername
   )
 
-  .put(
-    "/:id(\\d+)/update/avatar",
-    identityMiddleware.userPermissions,
-    userController.updateAvatar
-  )
-
   /**
    * Delete a user by his id
    * @route DELETE /api/v1/user/1/delete
