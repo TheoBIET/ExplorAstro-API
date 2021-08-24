@@ -1,6 +1,7 @@
 const { User } = require("../models");
 const bcrypt = require("bcrypt");
 const { errorMessage } = require("../constants");
+const {upload} = require("../utils");
 
 /**
  * @typedef {User} User
@@ -78,9 +79,7 @@ module.exports = {
         ...req.body,
       });
 
-      return res.status(200).json({
-        user,
-      });
+      return res.status(200).json(user);
     } catch (error) {
       console.error(error);
       return res.status(500).json({
@@ -119,9 +118,7 @@ module.exports = {
         username,
       });
 
-      return res.json({
-        user,
-      });
+      return res.json(user);
     } catch (error) {
       console.error(error);
       return res.status(500).json({
@@ -184,6 +181,30 @@ module.exports = {
         message: errorMessage.INTERNAL_ERROR,
       });
     }
+  },
+
+  updateAvatar: (req, res) => {
+    upload(req, req, async (err, file) => {
+      if (err) {
+        return res.status(400).json({
+          message: err.message,
+        });
+      }
+      
+      const user = await User.findByPk(req.user.id);
+
+      if (!user) {
+        return res.status(404).json({
+          message: errorMessage.USER_NOT_FOUND,
+        });
+      }
+
+      user.update({
+        avatar_url: req.file.filename,
+      });
+
+      return res.json(user);
+    });
   },
 
   delete: async (req, res) => {
