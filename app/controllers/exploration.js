@@ -85,8 +85,8 @@ module.exports = {
     const explorationData = exploration.toJSON();
 
     // Add weather informations
-    const lgt = exploration?.geog.coordinates[0];
-    const lat = exploration?.geog.coordinates[1];
+    const lgt = exploration?.geog.coordinates[0] ?? null;
+    const lat = exploration?.geog.coordinates[1] ?? null;
 
     if (lgt && lat) {
       const weather = await owp.getWeather(lgt, lat);
