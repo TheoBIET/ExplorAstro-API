@@ -1,13 +1,16 @@
+/* eslint-disable no-console */
+/* eslint-disable no-await-in-loop */
 require("dotenv").config();
 const log = require("log-beautify");
 const { Role } = require("../app/models");
-const { roleSeeding } = require("../app/constants");
+const { ROLE } = require("../app/constants");
 
 const seeding = {
   async init() {
     try {
       await seeding.seedRoles();
-    } catch (err) {
+    }
+    catch (err) {
       console.error(err);
     }
   },
@@ -15,8 +18,8 @@ const seeding = {
   async seedRoles() {
     log.info("Seed Roles...");
     let i = 0;
-    for (i = 0; i < roleSeeding.length; i += 1) {
-      await Role.create(roleSeeding[i]);
+    for (i = 0; i < ROLE.length; i += 1) {
+      await Role.create(ROLE[i]);
     }
     log.success("Seed Roles Done!");
   },

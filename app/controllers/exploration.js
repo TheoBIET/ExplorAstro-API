@@ -1,8 +1,9 @@
-const { Exploration } = require("../models");
-const { ERROR, EVENT } = require("../constants");
-const { Op } = require("sequelize");
-const { owp } = require("../utils");
-const { event, upload } = require("../utils");
+/* eslint-disable no-console */
+const { Op } = require('sequelize');
+const { Exploration } = require('../models');
+const { ERROR, EVENT } = require('../constants');
+const { owp } = require('../utils');
+const { event, upload } = require('../utils');
 
 /**
  * @typedef {CRS} CRS
@@ -53,17 +54,17 @@ const { event, upload } = require("../utils");
 module.exports = {
   getAll: async (req, res) => {
     try {
-      console.log("Ouais");
       const explorations = await Exploration.findAll({
         where: {
           is_published: true,
         },
-        include: ["author"],
-        order: [["date", "ASC"]],
+        include: ['author'],
+        order: [['date', 'ASC']],
       });
 
       res.status(200).json(explorations);
-    } catch (error) {
+    }
+    catch (error) {
       console.error(error);
       res.status(500).json({
         error: ERROR.INTERNAL_SERVER_ERROR,
@@ -81,21 +82,24 @@ module.exports = {
     const explorationData = exploration.toJSON();
 
     // Add weather informations
-    const lgt = exploration?.geog?.coordinates[0];
-    const lat = exploration?.geog?.coordinates[1];
+    if (exploration.geog) {
+      const lgt = exploration?.geog?.coordinates[0];
+      const lat = exploration?.geog?.coordinates[1];
 
-    if (lgt && lat) {
-      const weather = await owp.getWeather(lgt, lat);
-      explorationData.weather = weather;
+      if (lgt && lat) {
+        const weather = await owp.getWeather(lgt, lat);
+        explorationData.weather = weather;
+      }
     }
 
     res.json(explorationData);
   },
 
+  // eslint-disable-next-line consistent-return
   create: async (req, res) => {
     try {
       const { name } = req.body;
-      const user = req.user;
+      const { user } = req;
 
       if (!name) {
         return res.status(400).json({
@@ -138,7 +142,8 @@ module.exports = {
       return await event.saveUserAction(EVENT.ACTION.CREATE_EXPLORATION, user, {
         exploration,
       });
-    } catch (error) {
+    }
+    catch (error) {
       console.error(error);
       res.status(500).json({
         message: ERROR.INTERNAL_ERROR,
@@ -146,13 +151,13 @@ module.exports = {
     }
   },
 
+  // eslint-disable-next-line consistent-return
   update: async (req, res) => {
     try {
-      const { id } = req.params;
       const lgt = req.body.location?.lng;
       const lat = req.body.location?.lat;
-      const user = req.user;
-      const exploration = req.exploration;
+      const { user } = req;
+      const { exploration } = req;
 
       // We need to remove the information from the body that could corrupt the database record
       delete req.body.id;
@@ -167,7 +172,7 @@ module.exports = {
       await exploration.update({
         ...req.body,
         geog: {
-          type: "Point",
+          type: 'Point',
           coordinates: [lgt, lat],
         },
       });
@@ -186,7 +191,8 @@ module.exports = {
       return await event.saveUserAction(EVENT.ACTION.EDIT_EXPLORATION, user, {
         exploration,
       });
-    } catch (error) {
+    }
+    catch (error) {
       console.error(error);
       res.status(500).json({
         message: ERROR.INTERNAL_ERROR,
@@ -202,7 +208,7 @@ module.exports = {
         });
       }
 
-      const file = req.file;
+      const { file } = req;
 
       await req.exploration.update({
         image_url: file.location,
@@ -212,12 +218,12 @@ module.exports = {
     });
   },
 
+  // eslint-disable-next-line consistent-return
   delete: async (req, res) => {
     try {
-      const { id } = req.params;
-      const user = req.user;
+      const { user } = req;
 
-      const exploration = req.exploration;
+      const { exploration } = req;
 
       await exploration.destroy();
 
@@ -226,7 +232,8 @@ module.exports = {
       return await event.saveUserAction(EVENT.ACTION.DELETE_EXPLORATION, user, {
         exploration,
       });
-    } catch (error) {
+    }
+    catch (error) {
       console.error(error);
       res.status(500).json({
         message: ERROR.INTERNAL_ERROR,
