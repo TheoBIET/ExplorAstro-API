@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 const { Op } = require('sequelize');
-const { Exploration } = require('../models');
+const { Exploration, Comment } = require('../models');
 const { ERROR, EVENT } = require('../constants');
 const { owp } = require('../utils');
 const { event, upload } = require('../utils');
@@ -75,7 +75,10 @@ module.exports = {
   getInformations: async (req, res) => {
     const { id } = req.params;
     const exploration = await Exploration.findByPk(id, {
-      include: { all: true },
+      include: ['author', 'participants', {
+       association: 'comments',
+        include: ['author'],
+      }],
     });
 
     // Save exploration data in object for attach weather data if needed
@@ -158,6 +161,13 @@ module.exports = {
       const lat = req.body.location?.lat;
       const { user } = req;
       const { exploration } = req;
+      const maxParticipants = 100;
+
+      if (maxParticipants < req.body.max_participants) {
+        return res.status(400).json({
+          message: ERROR.MAX_PARTICIPANTS_LIMIT_REACHED,
+        });
+      }
 
       // We need to remove the information from the body that could corrupt the database record
       delete req.body.id;
