@@ -8,6 +8,8 @@ module.exports = {
     try {
       const { search, radius, lng, lat } = req.query;
 
+      console.log(lng, lat)
+
       const franceCoord = {
         lat: 46.227638,
         lng: 2.213749,
@@ -27,8 +29,8 @@ module.exports = {
     `,
         {
           bind: [
-            lat ?? franceCoord.lat,
             lng ?? franceCoord.lng,
+            lat ?? franceCoord.lat,
             radius ?? earthRadiusInKm,
           ],
         }
